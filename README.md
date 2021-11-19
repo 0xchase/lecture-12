@@ -246,3 +246,5 @@ pub fn sql(input: TokenStream) -> TokenStream {
 ```
 
 This definition is similar to the custom derive macro’s signature: we receive the tokens that are inside the parentheses and return the code we wanted to generate.
+
+*open proc-example*
