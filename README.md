@@ -45,22 +45,10 @@ let v2: Vec<u32> = vec![1, 2, 3];
 let v3: Vec<u32> = vec![1, 2, 3, 4];
 }
 ```
+
 Have you ever think about why you can pass any number of parameters you want to `vec!`? This is the magic of macro! A slightly simplified definition of the `vec!` macro is defined as:
 
-```rust
-#[macro_export] // bring this macro into scope
-macro_rules! vec { // similar with fn keyword. {} wraps the macro body.
-    ( $( $x:expr ),* ) => { // pattern to match
-        {
-            let mut temp_vec = Vec::new();
-            $(
-                temp_vec.push($x);
-            )*
-            temp_vec
-        }
-    };
-}
-```
+*open vec.rs*
 
 The valid pattern syntax in macro is different than `match` because macro patterns are matched against Rust code structure rather than values. In the above example,
 - First, a set of parentheses encompasses the whole pattern. 
@@ -98,6 +86,7 @@ use proc_macro;
 
 #[some_attribute] // place holder
 pub fn some_name (input: TokenStream) -> TokenStream {
+    
 }
 ```
 
@@ -107,7 +96,7 @@ This is the core of the macro: the source code that the macro is operating on ma
 
 When creating procedural macros, the definitions *must* reside in their own crate with a special crate type. 
 
-## Custom derive Macro
+## Custom derive macro
 
 Let’s create a crate named `hello_macro` that defines a trait named `HelloMacro` with one associated function named `hello_macro`.
 
@@ -124,16 +113,6 @@ $ cargo new hello_macro_derive --lib
 ```
 
 We need to declare the `hello_macro_derive` crate as a procedural macro crate. We’ll also need functionality from the `syn` and `quote` crates, so we need to add them as dependencies. Add the following to the *Cargo.toml* file for `hello_macro_derive`:
-
-Filename: hello_macro_derive/Cargo.toml
-
-```rust
-proc-macro = true
-
-[dependencies]
-syn = "1.0"
-quote = "1.0"
-```
 
 As for the actual definition, almost all procedural macro has the same parsing step, which is the following:
 
@@ -199,19 +178,8 @@ Note that the output for our derive macro is also a `TokenStream` and must be a 
 As for the actual defination of `impl_hello_macro`, it takes the parsed `DeriveInput` as the input and returns a `TokenStream`.
 
 Filename: hello_macro_derive/src/lib.rs
-```rust
-fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
-    let name = &ast.ident;
-    let gen = quote! {
-        impl HelloMacro for #name {
-            fn hello_macro() {
-                println!("Hello, Macro! My name is {}!", stringify!(#name));
-            }
-        }
-    };
-    gen.into()
-}
-```
+
+*Implement macro*
 
 The variable `name` contains the name of the struct as we described above, which can be printed as "pancakes".
 
@@ -225,10 +193,8 @@ We create a new binary project named `pancakes` and add the two crates as the de
 
 ```rust
 hello_macro = { path = "../hello_macro" }
-hello_macro_derive = { path = "../hello_macro/hello_macro_derive" }
+hello_macro_derive = { path = "../hello_macro_derive" }
 ```
-
-### `#[derive()]`
 
 Rust also provides many derivable traits for us.
 
