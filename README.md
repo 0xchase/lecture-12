@@ -6,6 +6,8 @@ Refence:
 - [RBE](https://doc.rust-lang.org/rust-by-example/macros.html)
 - [The Little Book of Rust Macros](https://veykril.github.io/tlborm/proc-macros/methodical.html)
 
+*Open notes*
+
 This week we will talk about macro.
 
 Fundamentally, macros are a way of *writing code that writes other code*, which is known as metaprogramming.
@@ -113,39 +115,7 @@ Rather than making our crate users implement the `HelloMacro` trait for each of 
 
 Without procedural macro, we can define a `HelloMacro` trait and then implement this trait for every type:
 
-```rust
-pub trait HelloMacro {
-    fn hello_macro();
-}
-
-struct Pancakes;
-
-impl HelloMacro for Pancakes {
-    fn hello_macro() {
-        println!("Hello, Macro! My name is Pancakes!");
-    }
-}
-
-fn main() {
-    Pancakes::hello_macro();
-}
-```
-
-As a smart coder, we don't want to do this for every type. Instead, we want something like
-
-
-Filename: src/main.rs
-```rust=
-use hello_macro::HelloMacro;
-use hello_macro_derive::HelloMacro;
-
-#[derive(HelloMacro)]
-struct Pancakes;
-
-fn main() {
-    Pancakes::hello_macro();
-}
-```
+*example1.rs*
 
 Currently, procedural macros need to be in their own crate. Let’s start a new crate called `hello_macro_derive` inside our `hello_macro` project
 
@@ -245,7 +215,6 @@ fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 The variable `name` contains the name of the struct as we described above, which can be printed as "pancakes".
 
-
 The `quote!` macro lets us define the Rust code that we want to return. The compiler expects something different to the direct result of the `quote!` macro’s execution, so we need to convert it to a `TokenStream`. We do this by calling the `into` method, which consumes this intermediate representation and returns a value of the required `TokenStream` type. The `quote!` macro also provides some very cool templating mechanics: we can enter `#name`, and `quote!` will replace it with the value in the variable name. You can even do some repetition similar to the way regular macros work. Check out [the `quote` crate’s docs](https://docs.rs/quote) for a thorough introduction.
 
 The `stringify!` macro used here is built into Rust. It takes a Rust expression, such as `1 + 2`, and at compile time turns the expression into a string literal, such as `"1 + 2"`. This is different than `format!` or `println!`, macros which *evaluate* the expression and then turn the result into a `String`, so if you give them `1 + 2` they will allocate a string `3`.
@@ -294,7 +263,6 @@ pub fn route(attr: TokenStream,  //  GET,"/" part
 
 You create a crate with the `proc-macro` crate type and implement a function that generates the code you want!
 
-
 ##  Function-like macros
 Function-like macros are similarly to `macro_rules!` macros, but are more flexible.
 
@@ -312,7 +280,3 @@ pub fn sql(input: TokenStream) -> TokenStream {
 ```
 
 This definition is similar to the custom derive macro’s signature: we receive the tokens that are inside the parentheses and return the code we wanted to generate.
-
-
-
-
